@@ -80,7 +80,8 @@ const commands = {
 - use-repo       Select repo to work with
 - create-file    Create new file in selected repo
 - create-folder  Create new folder in selected repo
-- list-repos     List your GitHub repositories
+- list-repo      List your GitHub repositories
+- gui menu       GUI
 - clear          Clear terminal
 - about          Show info
 
@@ -91,7 +92,7 @@ Langkah - langkah:
 3. Klik “Generate new token” → pilih “Tokens (classic)”
 4. Beri nama token
 5. Pilih Expiration (No Expiration)
-6. Pilih Scope / Permission (Centang All Repo + Delete Repo)
+6. Pilih Scope / Permission (Centang All)
 7. Generate token (Salin & Simpan Token yang telah diberikan)`,
   about: () => "Terminal Uploader v5.0\nCreated by Argantara Ramadhani",
   clear: () => { output.innerText = ""; return ""; },
@@ -108,7 +109,7 @@ Langkah - langkah:
     if (!currentRepo || !currentToken) return log("❌ Select a repo first using 'use-repo'");
     createFolderModal.style.display = "block";
   },
-  "list-repos": () => { listReposModal.style.display = "block"; }
+  "list-repo": () => { listReposModal.style.display = "block"; }
 };
 
 function executeCommand(cmd) {
@@ -302,3 +303,20 @@ commandInput.addEventListener("keydown", (e) => {
 
 // ----------------- Initialize -----------------
 bootSequence();
+
+// ----------------- GUI MODE FEATURE -----------------
+const guiMode = document.getElementById("guiMode");
+const exitGuiBtn = document.getElementById("exitGuiBtn");
+const terminal = document.getElementById("terminal");
+
+commands["gui menu"] = () => {
+  guiMode.classList.remove("hidden");
+  terminal.style.display = "none";
+  log("🟢 GUI Mode activated.");
+};
+
+exitGuiBtn.addEventListener("click", () => {
+  guiMode.classList.add("hidden");
+  terminal.style.display = "flex";
+  log("🔙 Back to Terminal Mode.");
+});
