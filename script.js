@@ -82,7 +82,17 @@ const commands = {
 - create-folder  Create new folder in selected repo
 - list-repos     List your GitHub repositories
 - clear          Clear terminal
-- about          Show info`,
+- about          Show info
+
+Sebelum menggunakan Web ini, pastikan anda telah membuat Github PAT.
+Langkah - langkah:
+1. Login Github anda
+2. Pergi ke https://github.com/settings/tokens
+3. Klik “Generate new token” → pilih “Tokens (classic)”
+4. Beri nama token
+5. Pilih Expiration (No Expiration)
+6. Pilih Scope / Permission (Centang All Repo + Delete Repo)
+7. Generate token (Salin & Simpan Token yang telah dibarikan)`,
   about: () => "Terminal Uploader v5.0\nCreated by Argantara Ramadhani",
   clear: () => { output.innerText = ""; return ""; },
   upload: () => showUploadModal("📤 Upload File"),
