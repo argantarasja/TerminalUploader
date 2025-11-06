@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal Uploader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="terminal">
+    <pre id="output"></pre>
+    <div class="input-line">
+      <span class="prompt">&gt;</span>
+      <input id="command" type="text" autofocus autocomplete="off" />
+    </div>
+  </div>
+
+  <!-- Modal Upload -->
+  <div id="uploadModal" class="modal">
+    <div class="modal-content">
+      <h3>📤 Upload to GitHub</h3>
+      <label>GitHub Token:</label>
+      <input type="password" id="tokenInput" placeholder="github_pat_..." />
+
+      <label>Repository (username/repo):</label>
+      <input type="text" id="repoInput" placeholder="exampleuser/myrepo" />
+
+      <label>Branch:</label>
+      <input type="text" id="branchInput" value="main" />
+
+      <button id="selectFilesBtn">Select Files</button>
+      <input type="file" id="fileSelector" multiple hidden />
+
+      <div class="modal-actions">
+        <button id="uploadBtn">Upload</button>
+        <button id="cancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
