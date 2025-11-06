@@ -69,6 +69,61 @@
     </div>
   </div>
 
+  <!-- Modal Use Repo -->
+  <div id="useRepoModal" class="modal">
+    <div class="modal-content">
+      <h3>📂 Select Repository</h3>
+      <label>GitHub Token:</label>
+      <input type="password" id="useToken" placeholder="github_pat_..." />
+      <label>Repository (username/repo):</label>
+      <input type="text" id="useRepo" placeholder="exampleuser/myrepo" />
+      <div class="modal-actions">
+        <button id="useRepoBtn">Set</button>
+        <button id="useRepoCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Create File -->
+  <div id="createFileModal" class="modal">
+    <div class="modal-content">
+      <h3>📄 Create New File</h3>
+      <label>File Path:</label>
+      <input type="text" id="newFilePath" placeholder="folder/file.txt" />
+      <label>Content:</label>
+      <textarea id="newFileContent" rows="6"></textarea>
+      <div class="modal-actions">
+        <button id="createFileBtn">Create</button>
+        <button id="createFileCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Create Folder -->
+  <div id="createFolderModal" class="modal">
+    <div class="modal-content">
+      <h3>📁 Create New Folder</h3>
+      <label>Folder Path:</label>
+      <input type="text" id="newFolderPath" placeholder="folder/subfolder" />
+      <div class="modal-actions">
+        <button id="createFolderBtn">Create</button>
+        <button id="createFolderCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal List Repos -->
+  <div id="listReposModal" class="modal">
+    <div class="modal-content">
+      <h3>📜 List Repositories</h3>
+      <label>GitHub Token:</label>
+      <input type="password" id="listToken" placeholder="github_pat_..." />
+      <button id="listReposBtn">Fetch</button>
+      <button id="listReposCancel">Cancel</button>
+      <pre id="reposListOutput" style="margin-top:10px; max-height:200px; overflow:auto;"></pre>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
