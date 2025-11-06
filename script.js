@@ -92,7 +92,7 @@ Langkah - langkah:
 4. Beri nama token
 5. Pilih Expiration (No Expiration)
 6. Pilih Scope / Permission (Centang All Repo + Delete Repo)
-7. Generate token (Salin & Simpan Token yang telah dibarikan)`,
+7. Generate token (Salin & Simpan Token yang telah diberikan)`,
   about: () => "Terminal Uploader v5.0\nCreated by Argantara Ramadhani",
   clear: () => { output.innerText = ""; return ""; },
   upload: () => showUploadModal("📤 Upload File"),
