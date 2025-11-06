@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terminal Uploader v3</title>
+  <title>Terminal Uploader v5</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,16 +21,12 @@
       <h3 id="modalTitle">📤 Upload to GitHub</h3>
       <label>GitHub Token:</label>
       <input type="password" id="tokenInput" placeholder="github_pat_..." />
-
       <label>Repository (username/repo):</label>
       <input type="text" id="repoInput" placeholder="exampleuser/myrepo" />
-
       <label>Branch:</label>
       <input type="text" id="branchInput" value="main" />
-
       <button id="selectFilesBtn">Select File</button>
       <input type="file" id="fileSelector" hidden />
-
       <div class="modal-actions">
         <button id="uploadBtn">Confirm</button>
         <button id="cancelBtn">Cancel</button>
@@ -44,19 +40,31 @@
       <h3>🆕 Create New Repository</h3>
       <label>GitHub Token:</label>
       <input type="password" id="createToken" placeholder="github_pat_..." />
-
       <label>Repository Name:</label>
       <input type="text" id="createRepoName" placeholder="my-new-repo" />
-
       <label>Private:</label>
       <select id="createPrivate">
         <option value="false">Public</option>
         <option value="true">Private</option>
       </select>
-
       <div class="modal-actions">
         <button id="createBtn">Create</button>
         <button id="createCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Delete Repo -->
+  <div id="deleteRepoModal" class="modal">
+    <div class="modal-content">
+      <h3>🗑️ Delete Repository</h3>
+      <label>GitHub Token:</label>
+      <input type="password" id="deleteToken" placeholder="github_pat_..." />
+      <label>Repository (username/repo):</label>
+      <input type="text" id="deleteRepoName" placeholder="exampleuser/myrepo" />
+      <div class="modal-actions">
+        <button id="deleteBtn">Delete</button>
+        <button id="deleteCancel">Cancel</button>
       </div>
     </div>
   </div>
