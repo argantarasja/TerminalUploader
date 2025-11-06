@@ -1,6 +1,7 @@
 const output = document.getElementById("output");
 const commandInput = document.getElementById("command");
 
+// Modal Elements
 const uploadModal = document.getElementById("uploadModal");
 const tokenInput = document.getElementById("tokenInput");
 const repoInput = document.getElementById("repoInput");
@@ -9,149 +10,177 @@ const selectFilesBtn = document.getElementById("selectFilesBtn");
 const fileSelector = document.getElementById("fileSelector");
 const uploadBtn = document.getElementById("uploadBtn");
 const cancelBtn = document.getElementById("cancelBtn");
+const modalTitle = document.getElementById("modalTitle");
 
-let selectedFiles = [];
+const createRepoModal = document.getElementById("createRepoModal");
+const createToken = document.getElementById("createToken");
+const createRepoName = document.getElementById("createRepoName");
+const createPrivate = document.getElementById("createPrivate");
+const createBtn = document.getElementById("createBtn");
+const createCancel = document.getElementById("createCancel");
 
-function log(line) {
+let selectedFile = null;
+
+// ----------------- Terminal Logging -----------------
+function log(line = "") {
   output.innerText += line + "\n";
   output.scrollTop = output.scrollHeight;
 }
 
+// ----------------- Boot Sequence -----------------
 function bootSequence() {
   const lines = ["Initializing system...", "Connecting to GitHub...", "Ready."];
   let i = 0;
   const interval = setInterval(() => {
     log(lines[i]);
     i++;
-    if (i === lines.length) clearInterval(interval);
-  }, 500);
+    if (i >= lines.length) clearInterval(interval);
+  }, 300);
 }
 
+// ----------------- Commands -----------------
 const commands = {
-  help: () => "Available commands:\n- upload\n- clear\n- about",
-  about: () => "Terminal Uploader v2.0\nCreated by [Your Name]\nSupports automatic repo creation and overwrite upload.",
-  clear: () => (output.innerText = ""),
-  upload: () => {
-    uploadModal.style.display = "block";
+  help: () => {
+    return "Available commands:\n- upload      Upload single file to GitHub\n- update      Update existing file in repo\n- create-repo Create new repository\n- clear       Clear terminal\n- about       Show info";
   },
+  about: () => "Terminal Uploader v4.0\nCreated by [Your Name]",
+  clear: () => { output.innerText = ""; },
+  upload: () => { showUploadModal("📤 Upload File"); },
+  update: () => { showUploadModal("✏️ Update File", true); },
+  "create-repo": () => { createRepoModal.style.display = "block"; }
 };
 
-async function ensureRepoExists(token, repoFullName) {
-  const [owner, repo] = repoFullName.split("/");
-  const check = await fetch(`https://api.github.com/repos/${repoFullName}`, {
-    headers: { Authorization: `token ${token}` },
-  });
-
-  if (check.status === 404) {
-    log(`Repository not found. Creating new repo: ${repo}...`);
-    const create = await fetch("https://api.github.com/user/repos", {
-      method: "POST",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: repo, private: false }),
-    });
-    if (create.ok) {
-      log(`✅ Repository created successfully!`);
-    } else {
-      log(`❌ Failed to create repository.`);
-      throw new Error("Repo creation failed");
-    }
+function executeCommand(cmd) {
+  const fn = commands[cmd.trim().toLowerCase()];
+  if (fn) {
+    const result = fn();
+    if (result) log(result);
+  } else {
+    log(`Command not found: ${cmd}`);
   }
 }
 
-async function uploadFileToGitHub(token, repoFullName, branch, file) {
-  const content = await file.text();
-  const encoded = btoa(unescape(encodeURIComponent(content)));
-  const filePath = file.name;
-
-  // Check if file already exists
-  const resCheck = await fetch(
-    `https://api.github.com/repos/${repoFullName}/contents/${filePath}?ref=${branch}`,
-    { headers: { Authorization: `token ${token}` } }
-  );
-
-  let sha = null;
-  if (resCheck.ok) {
-    const data = await resCheck.json();
-    sha = data.sha;
-  }
-
-  const uploadRes = await fetch(
-    `https://api.github.com/repos/${repoFullName}/contents/${filePath}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: `Upload ${filePath}`,
-        content: encoded,
-        branch,
-        sha,
-      }),
-    }
-  );
-
-  if (uploadRes.ok) {
-    log(`✅ Uploaded: ${filePath}`);
-  } else {
-    const err = await uploadRes.json();
-    log(`❌ Failed: ${filePath} (${err.message})`);
-  }
+// ----------------- Upload / Update -----------------
+function showUploadModal(title, isUpdate=false) {
+  modalTitle.innerText = title;
+  uploadModal.style.display = "block";
+  uploadModal.dataset.isUpdate = isUpdate;
 }
 
 selectFilesBtn.addEventListener("click", () => fileSelector.click());
+
 fileSelector.addEventListener("change", (e) => {
-  selectedFiles = Array.from(e.target.files);
-  log(`Selected ${selectedFiles.length} file(s).`);
+  selectedFile = e.target.files[0];
+  log(`Selected file: ${selectedFile.name}`);
 });
 
 cancelBtn.addEventListener("click", () => {
   uploadModal.style.display = "none";
-  selectedFiles = [];
+  selectedFile = null;
 });
 
 uploadBtn.addEventListener("click", async () => {
   const token = tokenInput.value.trim();
   const repoFullName = repoInput.value.trim();
-  const branch = branchInput.value.trim();
+  const branch = branchInput.value.trim() || "main";
+  const isUpdate = uploadModal.dataset.isUpdate === "true";
 
-  if (!token || !repoFullName || selectedFiles.length === 0) {
-    alert("Please fill all fields and select files.");
+  if (!token || !repoFullName || !selectedFile) {
+    alert("Please fill all fields and select a file.");
     return;
   }
 
   uploadModal.style.display = "none";
-  log(`Starting upload to ${repoFullName}/${branch}...`);
 
+  await uploadFileToGitHub(token, repoFullName, branch, selectedFile, isUpdate);
+  selectedFile = null;
+});
+
+// ----------------- GitHub API -----------------
+async function uploadFileToGitHub(token, repoFullName, branch, file, isUpdate=false) {
   try {
-    await ensureRepoExists(token, repoFullName);
-    for (const file of selectedFiles) {
-      await uploadFileToGitHub(token, repoFullName, branch, file);
+    const content = await file.text();
+    const encoded = btoa(unescape(encodeURIComponent(content)));
+    const path = file.name;
+
+    // Check if file exists
+    const checkRes = await fetch(`https://api.github.com/repos/${repoFullName}/contents/${path}?ref=${branch}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+
+    let sha = null;
+    if (checkRes.ok) {
+      const data = await checkRes.json();
+      sha = data.sha;
+      if (!isUpdate) {
+        log(`File exists. Use 'update' command to overwrite.`);
+        return;
+      }
     }
-    log("✅ Upload process completed.");
-  } catch (err) {
-    log(`❌ Upload failed: ${err.message}`);
+
+    const res = await fetch(`https://api.github.com/repos/${repoFullName}/contents/${path}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: `${isUpdate ? "Update" : "Upload"} ${path}`,
+        content: encoded,
+        branch,
+        sha
+      })
+    });
+
+    if (res.ok) log(`✅ ${isUpdate ? "Updated" : "Uploaded"}: ${path}`);
+    else {
+      const err = await res.json();
+      log(`❌ Failed: ${path} (${err.message})`);
+    }
+  } catch (e) {
+    log(`❌ Error: ${e.message}`);
+  }
+}
+
+// ----------------- Create Repo -----------------
+createBtn.addEventListener("click", async () => {
+  const token = createToken.value.trim();
+  const repoName = createRepoName.value.trim();
+  const privateRepo = createPrivate.value === "true";
+
+  if (!token || !repoName) {
+    alert("Please fill all fields.");
+    return;
   }
 
-  selectedFiles = [];
+  createRepoModal.style.display = "none";
+  try {
+    const res = await fetch("https://api.github.com/user/repos", {
+      method: "POST",
+      headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ name: repoName, private: privateRepo })
+    });
+    if (res.ok) log(`✅ Repository '${repoName}' created successfully!`);
+    else {
+      const err = await res.json();
+      log(`❌ Failed to create repo: ${err.message}`);
+    }
+  } catch (e) {
+    log(`❌ Error: ${e.message}`);
+  }
 });
 
-commandInput.addEventListener("keydown", async (e) => {
+createCancel.addEventListener("click", () => createRepoModal.style.display = "none");
+
+// ----------------- Terminal Input -----------------
+commandInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
-    const cmd = commandInput.value.trim();
+    const cmd = commandInput.value;
     log(`> ${cmd}`);
+    executeCommand(cmd);
     commandInput.value = "";
-    if (cmd in commands) {
-      const result = await commands[cmd]();
-      if (result) log(result);
-    } else if (cmd) {
-      log(`Command not found: ${cmd}`);
-    }
   }
 });
 
+// ----------------- Initialize -----------------
 bootSequence();
