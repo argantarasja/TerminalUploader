@@ -83,7 +83,7 @@ const commands = {
 - list-repos     List your GitHub repositories
 - clear          Clear terminal
 - about          Show info`,
-  about: () => "Terminal Uploader v5.0\nCreated by [Your Name]",
+  about: () => "Terminal Uploader v5.0\nCreated by Argantara Ramadhani",
   clear: () => { output.innerText = ""; return ""; },
   upload: () => showUploadModal("📤 Upload File"),
   update: () => showUploadModal("✏️ Update File", true),
