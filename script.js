@@ -61,7 +61,7 @@ function log(line = "") {
 
 // ----------------- Boot Sequence -----------------
 function bootSequence() {
-  const lines = ["Initializing system...", "Connecting to GitHub...", "Ready."];
+  const lines = ["Initializing system...", "Connecting to GitHub...", "Ready.", "Ketik 'help'"];
   let i = 0;
   const interval = setInterval(() => {
     log(lines[i]);
