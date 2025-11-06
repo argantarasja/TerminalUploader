@@ -309,14 +309,29 @@ const guiMode = document.getElementById("guiMode");
 const exitGuiBtn = document.getElementById("exitGuiBtn");
 const terminal = document.getElementById("terminal");
 
+// aktifkan GUI
 commands["gui menu"] = () => {
   guiMode.classList.remove("hidden");
   terminal.style.display = "none";
   log("🟢 GUI Mode activated.");
 };
 
+// tombol keluar
 exitGuiBtn.addEventListener("click", () => {
   guiMode.classList.add("hidden");
   terminal.style.display = "flex";
   log("🔙 Back to Terminal Mode.");
+});
+
+// aktifkan semua tombol di GUI Mode
+document.querySelectorAll("#guiMode [data-cmd]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const cmd = btn.dataset.cmd;
+    // tutup GUI Mode dulu
+    guiMode.classList.add("hidden");
+    terminal.style.display = "flex";
+    log(`> ${cmd}`);
+    // jalankan command sama seperti di terminal
+    executeCommand(cmd);
+  });
 });
