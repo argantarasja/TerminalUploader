@@ -125,21 +125,22 @@
   </div>
 
   <!-- GUI MODE (aktif saat ketik "gui menu") -->
-  <div id="guiMode" class="hidden">
-    <h2>🚀 Terminal Uploader GUI Mode</h2>
-    <div class="gui-buttons">
-      <button onclick="commands['upload']()">📤 Upload File</button>
-      <button onclick="commands['update']()">✏️ Update File</button>
-      <button onclick="commands['create-repo']()">🆕 Create Repo</button>
-      <button onclick="commands['delete-repo']()">🗑️ Delete Repo</button>
-      <button onclick="commands['use-repo']()">📂 Use Repo</button>
-      <button onclick="commands['create-file']()">📄 Create File</button>
-      <button onclick="commands['create-folder']()">📁 Create Folder</button>
-      <button onclick="commands['list-repo']()">📜 List Repos</button>
-      <button onclick="commands['clear']()">🧹 Clear Terminal</button>
-    </div>
-    <button id="exitGuiBtn">⬅️ Back to Terminal</button>
+<div id="guiMode" class="hidden">
+  <h2>🚀 Terminal Uploader GUI Mode</h2>
+  <div class="gui-buttons">
+    <button data-cmd="upload">📤 Upload File</button>
+    <button data-cmd="update">✏️ Update File</button>
+    <button data-cmd="create-repo">🆕 Create Repo</button>
+    <button data-cmd="delete-repo">🗑️ Delete Repo</button>
+    <button data-cmd="use-repo">📂 Use Repo</button>
+    <button data-cmd="create-file">📄 Create File</button>
+    <button data-cmd="create-folder">📁 Create Folder</button>
+    <button data-cmd="list-repos">📜 List Repos</button>
+    <button data-cmd="clear">🧹 Clear Terminal</button>
   </div>
+  <button id="exitGuiBtn">⬅️ Back to Terminal</button>
+</div>
+
 
   <script src="script.js"></script>
 </body>
