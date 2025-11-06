@@ -19,6 +19,12 @@ const createPrivate = document.getElementById("createPrivate");
 const createBtn = document.getElementById("createBtn");
 const createCancel = document.getElementById("createCancel");
 
+const deleteRepoModal = document.getElementById("deleteRepoModal");
+const deleteToken = document.getElementById("deleteToken");
+const deleteRepoName = document.getElementById("deleteRepoName");
+const deleteBtn = document.getElementById("deleteBtn");
+const deleteCancel = document.getElementById("deleteCancel");
+
 let selectedFile = null;
 
 // ----------------- Terminal Logging -----------------
@@ -41,13 +47,20 @@ function bootSequence() {
 // ----------------- Commands -----------------
 const commands = {
   help: () => {
-    return "Available commands:\n- upload      Upload single file to GitHub\n- update      Update existing file in repo\n- create-repo Create new repository\n- clear       Clear terminal\n- about       Show info";
+    return `Available commands:
+- upload         Upload single file to GitHub
+- update         Update existing file in repo
+- create-repo    Create new repository
+- delete-repo    Delete repository
+- clear          Clear terminal
+- about          Show info`;
   },
-  about: () => "Terminal Uploader v4.0\nCreated by [Your Name]",
-  clear: () => { output.innerText = ""; },
+  about: () => "Terminal Uploader v5.0\nCreated by [Your Name]",
+  clear: () => { output.innerText = ""; return ""; },
   upload: () => { showUploadModal("📤 Upload File"); },
   update: () => { showUploadModal("✏️ Update File", true); },
-  "create-repo": () => { createRepoModal.style.display = "block"; }
+  "create-repo": () => { createRepoModal.style.display = "block"; },
+  "delete-repo": () => { deleteRepoModal.style.display = "block"; }
 };
 
 function executeCommand(cmd) {
@@ -91,7 +104,6 @@ uploadBtn.addEventListener("click", async () => {
   }
 
   uploadModal.style.display = "none";
-
   await uploadFileToGitHub(token, repoFullName, branch, selectedFile, isUpdate);
   selectedFile = null;
 });
@@ -103,7 +115,6 @@ async function uploadFileToGitHub(token, repoFullName, branch, file, isUpdate=fa
     const encoded = btoa(unescape(encodeURIComponent(content)));
     const path = file.name;
 
-    // Check if file exists
     const checkRes = await fetch(`https://api.github.com/repos/${repoFullName}/contents/${path}?ref=${branch}`, {
       headers: { Authorization: `token ${token}` }
     });
@@ -120,16 +131,8 @@ async function uploadFileToGitHub(token, repoFullName, branch, file, isUpdate=fa
 
     const res = await fetch(`https://api.github.com/repos/${repoFullName}/contents/${path}`, {
       method: "PUT",
-      headers: {
-        Authorization: `token ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: `${isUpdate ? "Update" : "Upload"} ${path}`,
-        content: encoded,
-        branch,
-        sha
-      })
+      headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ message: `${isUpdate ? "Update" : "Upload"} ${path}`, content: encoded, branch, sha })
     });
 
     if (res.ok) log(`✅ ${isUpdate ? "Updated" : "Uploaded"}: ${path}`);
@@ -154,12 +157,14 @@ createBtn.addEventListener("click", async () => {
   }
 
   createRepoModal.style.display = "none";
+
   try {
     const res = await fetch("https://api.github.com/user/repos", {
       method: "POST",
       headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ name: repoName, private: privateRepo })
     });
+
     if (res.ok) log(`✅ Repository '${repoName}' created successfully!`);
     else {
       const err = await res.json();
@@ -171,6 +176,36 @@ createBtn.addEventListener("click", async () => {
 });
 
 createCancel.addEventListener("click", () => createRepoModal.style.display = "none");
+
+// ----------------- Delete Repo -----------------
+deleteBtn.addEventListener("click", async () => {
+  const token = deleteToken.value.trim();
+  const repoFullName = deleteRepoName.value.trim();
+
+  if (!token || !repoFullName) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  deleteRepoModal.style.display = "none";
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repoFullName}`, {
+      method: "DELETE",
+      headers: { Authorization: `token ${token}` }
+    });
+
+    if (res.status === 204) log(`✅ Repository '${repoFullName}' deleted successfully!`);
+    else {
+      const err = await res.json();
+      log(`❌ Failed to delete repo: ${err.message}`);
+    }
+  } catch (e) {
+    log(`❌ Error: ${e.message}`);
+  }
+});
+
+deleteCancel.addEventListener("click", () => deleteRepoModal.style.display = "none");
 
 // ----------------- Terminal Input -----------------
 commandInput.addEventListener("keydown", (e) => {
