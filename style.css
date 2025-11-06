@@ -64,7 +64,7 @@ pre {
   border-radius: 5px;
 }
 
-.modal-content input {
+.modal-content input, .modal-content select {
   width: 100%;
   margin: 5px 0 10px 0;
   background: #000;
