@@ -61,15 +61,44 @@ function log(line = "") {
 
 // ----------------- Boot Sequence -----------------
 function bootSequence() {
-  const lines = ["Initializing system...", "Connecting to GitHub...", "Ready.", "Ketik 'help'"];
-  let i = 0;
-  const interval = setInterval(() => {
-    log(lines[i]);
-    i++;
-    if (i >= lines.length) clearInterval(interval);
-  }, 300);
-}
+  output.innerText = ""; // bersihkan layar dulu
 
+  function showProgress(text, callback) {
+    let percent = 0;
+    const interval = setInterval(() => {
+      output.innerText = `${text} ${percent}%`;
+      percent++;
+      if (percent > 100) {
+        clearInterval(interval);
+        setTimeout(callback, 300);
+      }
+    }, 30);
+  }
+
+  // Jalankan tahap 1
+  showProgress("Initializing system...", () => {
+    // Tahap 2 setelah tahap 1 selesai
+    showProgress("Connecting to GitHub...", () => {
+      // Setelah tahap 2 selesai, tampilkan ASCII art
+      output.innerText = `
+ ▄▄▄       ██▀███   ▄████  ▄▄▄       ███▄ ▄███▓▄▄▄█████▓ ▄▄▄       ██▀███  
+▒████▄    ▓██ ▒ ██▒██▒ ▀█▒▒████▄    ▓██▒▀█▀ ██▒▓  ██▒ ▓▒▒████▄    ▓██ ▒ ██▒
+▒██  ▀█▄  ▓██ ░▄█ ▒██░▄▄▄░▒██  ▀█▄  ▓██    ▓██░▒ ▓██░ ▒░▒██  ▀█▄  ▓██ ░▄█ ▒
+░██▄▄▄▄██ ▒██▀▀█▄  ░▓█  ██▓░██▄▄▄▄██ ▒██    ▒██ ░ ▓██▓ ░ ░██▄▄▄▄██ ▒██▀▀█▄  
+ ▓█   ▓██▒░██▓ ▒██▒░▒▓███▀▒ ▓█   ▓██▒▒██▒   ░██▒  ▒██▒ ░  ▓█   ▓██▒░██▓ ▒██▒
+ ▒▒   ▓▒█░░ ▒▓ ░▒▓░ ░▒   ▒  ▒▒   ▓▒█░░ ▒░   ░  ░  ▒ ░░    ▒▒   ▓▒█░░ ▒▓ ░▒▓░
+  ▒   ▒▒ ░  ░▒ ░ ▒░  ░   ░   ▒   ▒▒ ░░  ░      ░    ░      ▒   ▒▒ ░  ░▒ ░ ▒░
+  ░   ▒     ░░   ░ ░ ░   ░   ░   ▒   ░      ░     ░        ░   ▒     ░░   ░ 
+      ░  ░   ░           ░       ░  ░       ░                  ░  ░   ░     
+  
+`;
+      setTimeout(() => {
+        log("");
+        log("");
+      }, 500);
+    });
+  });
+}
 // ----------------- Commands -----------------
 const commands = {
   help: () => `Available commands:
@@ -335,3 +364,63 @@ document.querySelectorAll("#guiMode [data-cmd]").forEach(btn => {
     executeCommand(cmd);
   });
 });
+
+// ----------------- Persistent ASCII + Screen Control -----------------
+
+const asciiArt = `
+ ▄▄▄       ██▀███   ▄████  ▄▄▄       ███▄ ▄███▓▄▄▄█████▓ ▄▄▄       ██▀███  
+▒████▄    ▓██ ▒ ██▒██▒ ▀█▒▒████▄    ▓██▒▀█▀ ██▒▓  ██▒ ▓▒▒████▄    ▓██ ▒ ██▒
+▒██  ▀█▄  ▓██ ░▄█ ▒██░▄▄▄░▒██  ▀█▄  ▓██    ▓██░▒ ▓██░ ▒░▒██  ▀█▄  ▓██ ░▄█ ▒
+░██▄▄▄▄██ ▒██▀▀█▄  ░▓█  ██▓░██▄▄▄▄██ ▒██    ▒██ ░ ▓██▓ ░ ░██▄▄▄▄██ ▒██▀▀█▄  
+ ▓█   ▓██▒░██▓ ▒██▒░▒▓███▀▒ ▓█   ▓██▒▒██▒   ░██▒  ▒██▒ ░  ▓█   ▓██▒░██▓ ▒██▒
+ ▒▒   ▓▒█░░ ▒▓ ░▒▓░ ░▒   ▒  ▒▒   ▓▒█░░ ▒░   ░  ░  ▒ ░░    ▒▒   ▓▒█░░ ▒▓ ░▒▓░
+  ▒   ▒▒ ░  ░▒ ░ ▒░  ░   ░   ▒   ▒▒ ░░  ░      ░    ░      ▒   ▒▒ ░  ░▒ ░ ▒░
+  ░   ▒     ░░   ░ ░ ░   ░   ░   ▒   ░      ░     ░        ░   ▒     ░░   ░ 
+      ░  ░   ░           ░       ░  ░       ░                  ░  ░   ░     
+ 
+`;
+
+let mainContent = "Ready.\nKetik 'help' untuk melihat perintah.";
+
+// fungsi render layar utama dengan ascii art selalu di atas
+function renderScreen(content = "") {
+  mainContent = content;
+  output.innerText = `${asciiArt}\n\n${content}`;
+}
+
+// ganti log agar hanya ubah mainContent (tanpa ASCII hilang)
+function log(line = "") {
+  mainContent += "\n" + line;
+  output.innerText = `${asciiArt}\n\n${mainContent}`;
+  output.scrollTop = output.scrollHeight;
+}
+
+// modifikasi command clear agar tidak hapus ascii art
+commands.clear = () => {
+  renderScreen(""); // kosongkan isi tapi tetap tampil ascii
+};
+
+// override executeCommand agar tampilannya diganti bukan ditambah
+function executeCommand(cmd) {
+  const command = cmd.trim().toLowerCase();
+  const fn = commands[command];
+
+  if (fn) {
+    // jika command selain clear, help, about, dan list, bersihkan dulu layar (kecuali clear juga udah handle)
+    if (!["clear"].includes(command)) {
+      renderScreen(""); 
+    }
+
+    const result = fn();
+    if (typeof result === "string") {
+      renderScreen(result);
+    }
+  } else {
+    renderScreen(`Command not found: ${cmd}`);
+  }
+}
+
+// jalankan render awal setelah boot selesai
+setTimeout(() => {
+  renderScreen("Ready.\nKetik 'help'");
+}, 3500);
